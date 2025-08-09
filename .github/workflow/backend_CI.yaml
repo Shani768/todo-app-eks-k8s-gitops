@@ -1,0 +1,47 @@
+name: backend CI/CD
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Docker Login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - name: Build and Push Docker Image with SHA
+        run: |
+          IMAGE_NAME=shani000786/kubernates-project-01-backend
+          UNIQUE_TAG=$(echo $GITHUB_SHA | cut -c1-8)
+          cd backend
+          docker build -t $IMAGE_NAME:$UNIQUE_TAG -t $IMAGE_NAME:latest .
+          docker push $IMAGE_NAME:$UNIQUE_TAG
+          docker push $IMAGE_NAME:latest
+          echo "IMAGE_TAG=$UNIQUE_TAG" >> $GITHUB_ENV
+
+      - name: Update Kubernetes Deployment Image Tag
+        run: |
+          sed -i "s|image: shani000786/kubernates-project-01-backend:.*|image: shani000786/kubernates-project-01-backend:${IMAGE_TAG}|g" k8s-deployment/backend.yaml
+
+      - name: Commit and Push Updated YAML
+        run: |
+          git config --global user.name "shani768"
+          git config --global user.email "zeeshantahir779@gmail.com"
+          git add k8s-deployment/backend.yaml
+          git commit -m "Update backend image tag to ${IMAGE_TAG}" || echo "No changes to commit"
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/Shani768/todo-app-eks-k8s-gitops
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
