@@ -32,7 +32,7 @@ function App() {
   return (
     <div style={styles.container}>
       <h2 style={styles.heading}>📝 Todo App </h2>
-      <h4> Argocd automatically update images works </h4>
+      <h4> Argocd automatically update images works !!!!</h4>
       <div style={styles.inputRow}>
         <input 
           value={title} 
