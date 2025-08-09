@@ -15,7 +15,7 @@ spec:
       containers:
         - name: frontend
           image: shani000786/kubernates-project-01-frontend:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           env:
             - name: VITE_API_URL
               value: "/api/todos"

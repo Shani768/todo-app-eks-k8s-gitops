@@ -22,7 +22,7 @@ spec:
       containers:
         - name: backend    
           image: shani000786/kubernates-project-01-backend:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           env:
             - name: DATABASE_URL
               value: mysql://root:root@mysql.default.svc.cluster.local:3306/todo
