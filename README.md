@@ -114,5 +114,43 @@ metadata:
   namespace: kube-system
 ```
 
+## Update arguments for your cluster:
+## In the Deployment, find the args: section and set:
+```
+args:
+  - --cluster-name=<CLUSTER_NAME>
+  - --ingress-class=alb
+  - --aws-vpc-id=<VPC_ID>
+  - --aws-region=<AWS_REGION>
+```
+
+## Apply Controller Manifest
+```
+kubectl apply -f v2_13_3_full.yaml
+```
+## Apply IngressClass Resources
+```
+curl -Lo v2_13_3_ingclass.yaml https://github.com/kubernetes-sigs/aws-load-balancer-controller/releases/download/v2.13.3/v2_13_3_ingclass.yaml
+kubectl apply -f v2_13_3_ingclass.yaml
+```
+
+## Verify Deployment
+```
+kubectl get deployment -n kube-system aws-load-balancer-controller
+```
+You should see READY as 1/1 or 2/2 and AVAILABLE.
+
+
+## After setup alb load balancer apply yaml manifest files
+cd k8s-deployment
+```
+kubectl apply -f mysqlpv.yaml
+kubectl apply -f mysql.yaml
+kubectl apply -f backend.yaml
+kubectl apply -f frontend.yaml
+kubectl apply -f frontend-ingress.yaml
+```
+
+## After aplying ingress you will get alb load balancer external IP 
 
 
