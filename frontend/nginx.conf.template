@@ -1,0 +1,19 @@
+server {
+  listen 80;
+
+  root /usr/share/nginx/html;
+  index index.html;
+
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+
+  location /env.js {
+    add_header Cache-Control "no-cache, no-store, must-revalidate";
+  }
+
+  location /api/ {
+    proxy_pass ${BACKEND_URL};  # <- ✅ semicolon must be inside the template!
+    proxy_set_header Host $host;
+  }
+}

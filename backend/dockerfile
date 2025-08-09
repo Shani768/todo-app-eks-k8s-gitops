@@ -1,0 +1,69 @@
+# ---------- STAGE 1: Builder ----------
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+# Generate Prisma Client
+RUN npx prisma generate
+
+# ---------- STAGE 2: Production ----------
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy only required files
+COPY package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/index.js ./index.js
+COPY --from=builder /app/prisma ./prisma
+
+# You must include prisma CLI for `npx prisma db push` to work
+RUN npm install prisma
+
+EXPOSE 3001
+
+# This now runs migration + starts server
+CMD ["sh", "-c", "npx prisma db push && node index.js"]
+
+
+
+
+
+# # ---------- STAGE 1: Builder ----------
+# FROM node:20-alpine AS builder
+
+# WORKDIR /app
+
+# COPY package*.json ./
+# RUN npm install
+
+# COPY . .
+
+# # Generate Prisma Client
+# RUN npx prisma generate
+
+# # ---------- STAGE 2: Production ----------
+# FROM node:20-alpine
+
+# WORKDIR /app
+
+# # Install only production dependencies
+# COPY package*.json ./
+# RUN npm install --omit=dev --ignore-scripts && npm cache clean --force
+
+# # Copy necessary runtime files
+# COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+# COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+# COPY --from=builder /app/index.js ./
+# COPY --from=builder /app/prisma ./prisma
+# # COPY --from=builder /app/.env ./
+
+# EXPOSE 3001
+# CMD ["node", "index.js"]
+
+
