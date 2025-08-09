@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: shani000786/kubernates-project-01-frontend:1901e57c
+          image: shani000786/kubernates-project-01-frontend:c963a813
           imagePullPolicy: Always
           env:
             - name: VITE_API_URL
